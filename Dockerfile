@@ -14,12 +14,12 @@ RUN npm ci --only=production
 
 FROM node:20-alpine
 
-# Install build dependencies for better-sqlite3
-RUN apk add --no-cache python3 make g++
+# Install build dependencies for better-sqlite3 and su-exec for user switching
+RUN apk add --no-cache python3 make g++ su-exec
 
-# Create non-root user
+# Create default non-root user (will be updated at runtime if PUID/PGID are set)
 RUN addgroup -g 1001 -S nodejs && \
-    adduser -S nodejs -u 1001
+    adduser -S nodejs -u 1001 -G nodejs
 
 WORKDIR /app
 
@@ -29,9 +29,10 @@ COPY --chown=nodejs:nodejs server/package*.json ./
 COPY --chown=nodejs:nodejs server/src ./src
 COPY --from=web-builder --chown=nodejs:nodejs /app/web/dist ./public
 
-# Switch to non-root user
-USER nodejs
+# Copy entrypoint script
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 EXPOSE 5600
 
-CMD ["node", "src/index.js"]
+ENTRYPOINT ["/entrypoint.sh"]

@@ -1,12 +1,15 @@
 version: '3.8'
 
 services:
-  app:
-    image: ghcr.io/migz93/msical:latest
-    container_name: msical
+  ms-ical:
+    image: ghcr.io/migz93/ms-ical:latest
+    container_name: ms-ical
     network_mode: bridge
     ports:
       - "5600:5600"
     volumes:
-      - ./config:/config
+      - /opt/ms-ical:/config
+    environment:
+      - PUID=1000  # Set to your user's UserID
+      - PGID=1000  # Set to your user's GroupID
     restart: unless-stopped

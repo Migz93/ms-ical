@@ -38,10 +38,14 @@ docker run -d \
   --name ms-ical \
   -p 5600:5600 \
   -v /opt/ms-ical:/config \
+  -e PUID=1000 \
+  -e PGID=1000 \
   ghcr.io/migz93/ms-ical:latest
 ```
 
 Then access the application at http://docker-host-ip:5600
+
+> **Tip**: Set `PUID` and `PGID` to match your user ID to avoid permission issues. Run `id -u` and `id -g` to find your UID and GID. If not specified, defaults to 1000:1000.
 
 ### Docker Compose
 
@@ -59,7 +63,10 @@ services:
       - "5600:5600"
     volumes:
       - /opt/ms-ical:/config
-    restart: always
+    environment:
+      - PUID=1000  # Set to your user's UserID
+      - PGID=1000  # Set to your user's GroupID
+    restart: unless-stopped
 ```
 
 Then run:
