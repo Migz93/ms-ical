@@ -70,7 +70,7 @@ router.get('/:token.ics', async (req, res) => {
       }
     }
     
-    const calendar = ical({ name: feed.name, timezone: feed.timezone });
+    const calendar = ical({ name: feed.name });
     
     for (const event of allEvents) {
       const eventData = {

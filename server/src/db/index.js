@@ -51,7 +51,6 @@ export function initDatabase() {
       calendar_ids_json TEXT NOT NULL,
       include_past_days INTEGER DEFAULT 30,
       include_future_days INTEGER DEFAULT 365,
-      timezone TEXT DEFAULT 'Europe/Jersey',
       refresh_interval_hours INTEGER DEFAULT 6,
       last_refreshed_at DATETIME,
       enabled INTEGER DEFAULT 1,

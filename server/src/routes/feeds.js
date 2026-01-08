@@ -10,12 +10,16 @@ function getBaseUrl() {
   return settings?.base_url || 'http://localhost:5600';
 }
 
-const feedSchema = z.object({
+const createFeedSchema = z.object({
   name: z.string().min(1),
   calendarIds: z.array(z.string()).min(1),
   includePastDays: z.number().int().min(0).optional(),
   includeFutureDays: z.number().int().min(1).optional(),
-  timezone: z.string().optional(),
+  refreshIntervalHours: z.number().int().min(1).optional()
+});
+
+const updateFeedSchema = z.object({
+  calendarIds: z.array(z.string()).min(1).optional(),
   refreshIntervalHours: z.number().int().min(1).optional()
 });
 
@@ -23,7 +27,7 @@ router.get('/', (req, res) => {
   try {
     const feeds = db.prepare(`
       SELECT id, name, token, calendar_ids_json, include_past_days, 
-             include_future_days, timezone, refresh_interval_hours, 
+             include_future_days, refresh_interval_hours, 
              last_refreshed_at, enabled, created_at, updated_at
       FROM feeds
       WHERE enabled = 1
@@ -38,7 +42,6 @@ router.get('/', (req, res) => {
       calendarIds: JSON.parse(feed.calendar_ids_json),
       includePastDays: feed.include_past_days,
       includeFutureDays: feed.include_future_days,
-      timezone: feed.timezone,
       refreshIntervalHours: feed.refresh_interval_hours,
       lastRefreshedAt: feed.last_refreshed_at,
       url: `${baseUrl}/ical/${feed.token}.ics`,
@@ -54,22 +57,21 @@ router.get('/', (req, res) => {
 
 router.post('/', (req, res) => {
   try {
-    const validated = feedSchema.parse(req.body);
+    const validated = createFeedSchema.parse(req.body);
     
     const token = generateToken(32);
     const calendarIdsJson = JSON.stringify(validated.calendarIds);
     
     const result = db.prepare(`
       INSERT INTO feeds (name, token, calendar_ids_json, include_past_days, 
-                        include_future_days, timezone, refresh_interval_hours)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
+                        include_future_days, refresh_interval_hours)
+      VALUES (?, ?, ?, ?, ?, ?)
     `).run(
       validated.name,
       token,
       calendarIdsJson,
       validated.includePastDays || 30,
       validated.includeFutureDays || 365,
-      validated.timezone || 'Europe/Jersey',
       validated.refreshIntervalHours || 6
     );
     

@@ -17,7 +17,6 @@ function SettingsPage() {
     calendarIds: [],
     includePastDays: 30,
     includeFutureDays: 365,
-    timezone: 'Europe/Jersey',
     refreshIntervalHours: 6
   });
 
@@ -139,7 +138,7 @@ function SettingsPage() {
           calendarIds: [],
           includePastDays: 30,
           includeFutureDays: 365,
-          timezone: 'Europe/Jersey'
+          refreshIntervalHours: 6
         });
         loadFeeds();
       } else {
@@ -441,6 +440,33 @@ function SettingsPage() {
                 <option value={336}>Every 2 weeks</option>
                 <option value={672}>Every 4 weeks</option>
               </select>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-2 text-gray-200">Past Days</label>
+                <input
+                  type="number"
+                  min="0"
+                  max="365"
+                  value={newFeed.includePastDays}
+                  onChange={(e) => setNewFeed({ ...newFeed, includePastDays: parseInt(e.target.value) || 0 })}
+                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-gray-100 focus:border-primary focus:ring-1 focus:ring-primary"
+                />
+                <p className="text-xs text-gray-400 mt-1">Days in the past to include</p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2 text-gray-200">Future Days</label>
+                <input
+                  type="number"
+                  min="0"
+                  max="730"
+                  value={newFeed.includeFutureDays}
+                  onChange={(e) => setNewFeed({ ...newFeed, includeFutureDays: parseInt(e.target.value) || 0 })}
+                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-gray-100 focus:border-primary focus:ring-1 focus:ring-primary"
+                />
+                <p className="text-xs text-gray-400 mt-1">Days in the future to include</p>
+              </div>
             </div>
 
             <button
